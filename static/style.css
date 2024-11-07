@@ -1,0 +1,19 @@
+body { font-family: Arial, sans-serif; margin: 20px; }
+form { margin-bottom: 20px; }
+label { display: inline-block; width: 100px; }
+input[type="number"] { width: 100px; }
+.thumbnail { display: inline-block; margin: 10px; text-align: center; position: relative; }
+.thumbnail img { border: 1px solid #ccc; cursor: pointer; }
+.config { font-size: 0.9em; color: #555; }
+.high-res {
+    position: absolute;
+    display: none;
+    border: 2px solid #333;
+    z-index: 10;
+    width: 100px; /* Adjust as needed */
+    height: 100px; /* Adjust as needed */
+    overflow: hidden;
+}
+.high-res img {
+    position: absolute;
+}

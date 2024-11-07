@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Camera Capture</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <h1>Camera Configuration</h1>
+    <form method="post">
+        <label for="exposure">Exposure:</label>
+        <input type="number" name="exposure" step="0.1" required><br>
+        <label for="gain">Gain:</label>
+        <input type="number" name="gain" step="0.1" required><br>
+        <label for="focus_min">Focus Min:</label>
+        <input type="number" name="focus_min" step="0.1" required><br>
+        <label for="focus_max">Focus Max (optional):</label>
+        <input type="number" name="focus_max" step="0.1"><br>
+        <label for="focus_step">Focus Step (optional):</label>
+        <input type="number" name="focus_step" step="0.1"><br>
+        <label for="aperture">Aperture:</label>
+        <input type="number" name="aperture" step="0.1" required><br>
+        <input type="submit" value="Capture">
+    </form>
+    <h2>Captured Images</h2>
+    <div id="thumbnails">
+        {% for image in images_info %}
+            <div class="thumbnail">
+                <a href="/download/{{ image.image_filename }}">
+                    <img src="/thumbnails/{{ image.thumbnail_filename }}" alt="Thumbnail">
+                </a>
+                <div class="config">Exposure: {{ image.config.exposure }}, Gain: {{ image.config.gain }}, Focus: {{ image.config.focus }}, Aperture: {{ image.config.aperture }}</div>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

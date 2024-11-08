@@ -3,13 +3,13 @@
 <head>
     <meta charset="utf-8">
     <title>Camera Capture</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body>
     <h1>Camera Configuration</h1>
-    <form method="post" action="{{ url_for('camera.capture') }}">
+    <form action="{{ url_for('capture') }}" method="post">
         <label for="exposure">Exposure:</label>
         <input type="number" name="exposure" step="0.1" required><br>
         <label for="gain">Gain:</label>
@@ -24,7 +24,6 @@
         <input type="number" name="aperture" step="0.1" required><br>
         <input type="submit" value="Capture">
     </form>
-
     <h2>Captured Images</h2>
     <div id="thumbnails">
         {% for image in images_info %}

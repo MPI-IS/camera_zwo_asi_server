@@ -1,3 +1,4 @@
+nightskycam-focus
 Flask
 numpy
 Pillow
@@ -6,3 +7,4 @@ gunicorn
 opencv-python
 python-dotenv
 types-Pillow
+

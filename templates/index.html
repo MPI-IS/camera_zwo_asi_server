@@ -11,17 +11,17 @@
     <h1>Camera Configuration</h1>
     <form method="post" action="{{ url_for('camera.capture') }}">
         <label for="exposure">Exposure:</label>
-        <input type="number" name="exposure" step="0.1" required><br>
+        <input type="number" name="exposure" step="0.1" value="{{ config.default_camera_config.exposure }}" required><br>
         <label for="gain">Gain:</label>
-        <input type="number" name="gain" step="0.1" required><br>
+        <input type="number" name="gain" step="0.1" value="{{ config.default_camera_config.gain }}" required><br>
         <label for="focus_min">Focus Min:</label>
-        <input type="number" name="focus_min" step="0.1" required><br>
+        <input type="number" name="focus_min" step="0.1" value="{{ config.default_camera_config.focus or 0 }}" required><br>
         <label for="focus_max">Focus Max (optional):</label>
         <input type="number" name="focus_max" step="0.1"><br>
         <label for="focus_step">Focus Step (optional):</label>
         <input type="number" name="focus_step" step="0.1"><br>
         <label for="aperture">Aperture:</label>
-        <input type="number" name="aperture" step="0.1" required><br>
+        <input type="number" name="aperture" step="0.1" value="{{ config.default_camera_config.aperture or 0 }}" required><br>
         <input type="submit" value="Capture">
     </form>
 

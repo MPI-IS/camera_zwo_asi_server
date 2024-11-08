@@ -5,3 +5,4 @@ toml
 gunicorn
 opencv-python
 python-dotenv
+types-Pillow

@@ -99,7 +99,26 @@ def capture():
                 }
             )
 
-    return jsonify(images_info)
+    # Fetch the updated list of thumbnails
+    thumbnails = []
+    for filename in os.listdir(image_config.img_folder):
+        if filename.startswith("thumbnail_") and filename.endswith(".jpeg"):
+            focus = filename.split("_")[-1].replace(".jpeg", "")
+            thumbnails.append(
+                {
+                    "thumbnail_filename": filename,
+                    "image_filename": filename.replace("thumbnail_", ""),
+                    "focus": focus,
+                    "config": {
+                        "exposure": "N/A",
+                        "gain": "N/A",
+                        "focus": focus,
+                        "aperture": "N/A",
+                    },
+                }
+            )
+
+    return jsonify(thumbnails)
 
 
 @camera_bp.route("/media/<filename>")

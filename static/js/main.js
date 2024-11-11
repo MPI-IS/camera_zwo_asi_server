@@ -6,7 +6,7 @@ $(document).ready(function() {
             method: 'POST',
             data: $(this).serialize(),
             success: function(data) {
-                $('#thumbnails tbody').empty();
+                $('#thumbnails tbody').empty(); // Clear existing thumbnails
                 data.forEach(function(image) {
                     const row = $('<tr></tr>');
                     const thumbnailColumn = $('<td class="align-middle"></td>');
@@ -24,7 +24,8 @@ $(document).ready(function() {
                         thumbnailColumn.append(thumbnail);
                     }
 
-                    const configInfo = 'Exposure: ' + image.config.exposure + ', Gain: ' + image.config.gain;
+                    // Use let instead of const for configInfo
+                    let configInfo = 'Exposure: ' + image.config.exposure + ', Gain: ' + image.config.gain;
                     if (image.config.focus !== null) {
                         configInfo += ', Focus: ' + image.config.focus;
                     }

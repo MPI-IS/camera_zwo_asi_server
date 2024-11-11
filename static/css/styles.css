@@ -2,9 +2,30 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 form { margin-bottom: 20px; }
 label { display: inline-block; width: 100px; }
 input[type="number"] { width: 100px; }
-.thumbnail { display: inline-block; margin: 10px; text-align: center; position: relative; }
-.thumbnail img { border: 1px solid #ccc; cursor: pointer; }
+
+.table td, .table th {
+    padding: 0; /* Remove padding from table cells */
+    border: none; /* Optional: Remove borders if not needed */
+}
+
+.thumbnail {
+    display: block; /* Ensure the thumbnail div takes full width */
+    margin: 0; /* Remove margin */
+    text-align: center;
+    position: relative;
+}
+
+.thumbnail img {
+    display: block; /* Ensure the image takes full width of the container */
+    width: auto; /* Set width to auto to maintain natural size */
+    height: auto; /* Set height to auto to maintain natural size */
+    max-width: 100%; /* Ensure it doesn't overflow the container */
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
 .config { font-size: 0.9em; color: #555; }
+
 .high-res {
     position: absolute;
     display: none;
@@ -14,6 +35,7 @@ input[type="number"] { width: 100px; }
     height: 100px; /* Adjust as needed */
     overflow: hidden;
 }
+
 .high-res img {
     position: absolute;
 }

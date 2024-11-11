@@ -1,13 +1,14 @@
-from pathlib import Path
-from flask import Flask
-from routes.camera_routes import camera_bp
-from capture import CameraType, CameraConfig, ImageConfig
-from dotenv import load_dotenv
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+from flask import Flask
+
+from capture import CameraConfig, CameraType, ImageConfig
+from routes.camera_routes import camera_bp
 
 
 def _get_default_config() -> CameraConfig:
-    load_dotenv()
     camera_type_ = str(os.getenv("CAMERA", "dummy"))
     has_focus = os.getenv("HAS_FOCUS", "FALSE").upper() == "TRUE"
     has_aperture = os.getenv("HAS_APERTURE", "FALSE").upper() == "TRUE"
@@ -28,7 +29,6 @@ def _get_default_config() -> CameraConfig:
 
 
 def _get_image_config() -> ImageConfig:
-    load_dotenv()
     folder = os.getenv("IMG_FOLDER", "/tmp/camera_zwo_asi_server")
     Path(folder).mkdir(exist_ok=True)
     tw = int(os.getenv("THUMBNAIL_WIDTH", 200))
@@ -36,7 +36,9 @@ def _get_image_config() -> ImageConfig:
     return ImageConfig(img_folder=folder, thumbnail=(tw, th))
 
 
-def create_app():
+def create_app() -> Flask:
+    path_to_env_file = os.path.join(os.path.dirname(__file__), ".env")
+    load_dotenv(dotenv_path=path_to_env_file, override=True)
     app = Flask(__name__)
     app.config["default_camera_config"] = _get_default_config()
     app.config["image_config"] = _get_image_config()
@@ -47,6 +49,5 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    load_dotenv()
     debug = os.getenv("DEBUG", "TRUE").upper() == "TRUE"
     app.run(debug=debug)

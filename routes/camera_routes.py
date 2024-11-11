@@ -5,6 +5,7 @@ from datetime import datetime
 import numpy as np
 from flask import (
     Blueprint,
+    abort,
     current_app,
     jsonify,
     render_template,
@@ -83,6 +84,20 @@ def capture():
             logging.info(f"Image and thumbnail saved for focus {focus}")
         except Exception as e:
             logging.error(f"Failed to capture image for focus {focus}: {e}")
+            images_info.append(
+                {
+                    "focus": focus,
+                    "thumbnail_filename": None,
+                    "image_filename": None,
+                    "config": {
+                        "exposure": exposure,
+                        "gain": gain,
+                        "focus": focus,
+                        "aperture": aperture,
+                    },
+                    "error": str(e),
+                }
+            )
 
     return jsonify(images_info)
 

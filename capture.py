@@ -1,3 +1,4 @@
+
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
@@ -85,9 +86,18 @@ def _webcam_capture() -> np.ndarray:
     with webcam_camera() as camera:
         if not camera.isOpened():
             raise RuntimeError("failed to connect to webcam")
+
+        # Set the camera to maximum resolution
+        camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)  # Set to maximum width
+        camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)  # Set to maximum height
+
         ret, frame = camera.read()
         if not ret:
             raise RuntimeError("Failed to capture image with the webcam")
+
+        # Convert from BGR to RGB
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
     return frame
 
 

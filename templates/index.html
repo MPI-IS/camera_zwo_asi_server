@@ -3,38 +3,83 @@
 <head>
     <meta charset="utf-8">
     <title>Camera Capture</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </head>
 <body>
-    <h1>Camera Configuration</h1>
-    <form method="post" action="{{ url_for('camera.capture') }}">
-        <label for="exposure">Exposure:</label>
-        <input type="number" name="exposure" step="0.1" value="{{ config.default_camera_config.exposure }}" required><br>
-        <label for="gain">Gain:</label>
-        <input type="number" name="gain" step="0.1" value="{{ config.default_camera_config.gain }}" required><br>
-        <label for="focus_min">Focus Min:</label>
-        <input type="number" name="focus_min" step="0.1" value="{{ config.default_camera_config.focus or 0 }}" required><br>
-        <label for="focus_max">Focus Max (optional):</label>
-        <input type="number" name="focus_max" step="0.1"><br>
-        <label for="focus_step">Focus Step (optional):</label>
-        <input type="number" name="focus_step" step="0.1"><br>
-        <label for="aperture">Aperture:</label>
-        <input type="number" name="aperture" step="0.1" value="{{ config.default_camera_config.aperture or 0 }}" required><br>
-        <input type="submit" value="Capture">
-    </form>
+    <div class="bg-success text-white text-center p-3">
+        <h2>{{ request.host }}</h2>
+    </div>
+    
+    <div class="container mt-4">
+        <h1>Camera Configuration</h1>
+        <form method="post" action="{{ url_for('camera.capture') }}">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <td><label for="exposure">Exposure:</label></td>
+                        <td><input type="number" name="exposure" step="0.1" value="{{ config.default_camera_config.exposure }}" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="gain">Gain:</label></td>
+                        <td><input type="number" name="gain" step="0.1" value="{{ config.default_camera_config.gain }}" required></td>
+                    </tr>
+                    {% if config.default_camera_config.focus is not none %}
+                    <tr>
+                        <td><label for="focus_min">Focus Min:</label></td>
+                        <td><input type="number" name="focus_min" step="0.1" value="{{ config.default_camera_config.focus or 0 }}" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="focus_max">Focus Max (optional):</label></td>
+                        <td><input type="number" name="focus_max" step="0.1"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="focus_step">Focus Step (optional):</label></td>
+                        <td><input type="number" name="focus_step" step="0.1"></td>
+                    </tr>
+                    {% endif %}
+                    {% if config.default_camera_config.aperture is not none %}
+                    <tr>
+                        <td><label for="aperture">Aperture:</label></td>
+                        <td><input type="number" name="aperture" step="0.1" value="{{ config.default_camera_config.aperture or 0 }}" required></td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td colspan="2"><input type="submit" value="Capture" class="btn btn-primary"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
 
-    <h2>Captured Images</h2>
-    <div id="thumbnails">
-        {% for image in images_info %}
-            <div class="thumbnail">
-                <a href="{{ url_for('camera.serve_media', filename=image.image_filename) }}">
-                    <img src="{{ url_for('camera.serve_media', filename=image.thumbnail_filename) }}" alt="Thumbnail">
-                </a>
-                <div class="config">Exposure: {{ image.config.exposure }}, Gain: {{ image.config.gain }}, Focus: {{ image.config.focus }}, Aperture: {{ image.config.aperture }}</div>
-            </div>
-        {% endfor %}
+        <h2>Captured Images</h2>
+        <div id="thumbnails" class="table-responsive">
+            <table class="table table-bordered">
+                <tbody>
+                    {% for image in images_info %}
+                    <tr>
+                        <td class="align-middle" style="width: 50%;">
+                            {% if image.error %}
+                                <div class="alert alert-danger">{{ image.error }}</div>
+                            {% else %}
+                                <div class="thumbnail">
+                                    <a href="{{ url_for('camera.serve_media', filename=image.image_filename) }}">
+                                        <img src="{{ url_for('camera.serve_media', filename=image.thumbnail_filename) }}" alt="Thumbnail" class="img-fluid">
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle" style="width: 50%;">
+                            <div class="config"> 
+                                Exposure: {{ image.config.exposure }}, Gain: {{ image.config.gain }}{% if image.config.focus is not none %}, Focus: {{ image.config.focus }}{% endif %}{% if image.config.aperture is not none %}, Aperture: {{ image.config.aperture }}{% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>

@@ -79,7 +79,7 @@ def webcam_camera():
 
 def _dummy_capture() -> np.ndarray:
     time.sleep(1.5)
-    return np.random.randint(0, 256, (480, 640, 3), dtype=np.uint8)
+    return np.random.randint(0, 256, (960, 1280, 3), dtype=np.uint8)
 
 
 def _webcam_capture() -> np.ndarray:

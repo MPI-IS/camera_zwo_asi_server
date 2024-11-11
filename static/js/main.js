@@ -62,16 +62,49 @@ $(document).ready(function() {
     });
 
     function addHoverEffect() {
-        $('.thumbnail img').hover(function() {
+	$('.thumbnail img').hover(function() {
             const thumbnail = $(this);
+            const fullResImgSrc = thumbnail.parent().attr('href').replace('thumbnail_', ''); // Full-resolution image path
+
+            // Log the full-resolution image path
+            console.log('Full Resolution Image Path:', fullResImgSrc);
+
+            // Create the high-resolution image element
+            const highResImg = $('<img>')
+		  .attr('src', fullResImgSrc)
+		  .attr('alt', 'High Resolution')
+		  .addClass('high-res');
+
+            // Append the high-resolution image to the corresponding high-res container
             const highResContainer = thumbnail.closest('tr').find('.high-res-container');
-            highResContainer.find('img').show(); // Show the high-resolution image
-        }, function() {
-            const thumbnail = $(this);
-            const highResContainer = thumbnail.closest('tr').find('.high-res-container');
-            highResContainer.find('img').hide(); // Hide the high-resolution image
-        });
+            highResContainer.empty().append(highResImg);
+            highResImg.show(); // Show the high-res image
+
+            // Adjust position based on mouse movement
+            thumbnail.on('mousemove', function(e) {
+		const offset = thumbnail.offset();
+		const x = e.pageX - offset.left;     // Get mouse x relative to the thumbnail
+		const y = e.pageY - offset.top;      // Get mouse y relative to the thumbnail
+
+		// Scale the position based on the high-res image and thumbnail size
+		const scaleFactor = highResImg.width() / thumbnail.width();
+		const newLeft = -(x * scaleFactor - (highResImg.width() / 2));
+		const newTop = -(y * scaleFactor - (highResImg.height() / 2));
+
+		// Move the high-res image based on calculated positions
+		highResImg.css({
+                    left: newLeft + 'px',
+                    top: newTop + 'px',
+                    position: 'absolute'
+		});
+            });
+
+	}, function() {
+            // Clear the high-res image when the mouse leaves
+            $(this).closest('tr').find('.high-res-container').empty();
+	});
     }
+    
 
     loadImages(); // Initial load of images
 });

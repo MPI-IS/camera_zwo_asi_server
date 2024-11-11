@@ -42,6 +42,21 @@ input[type="number"] {
     color: #555;
 }
 
-.high-res-container img {
-    display: none; /* Initially hide the high-resolution images */
+.high-res-container {
+    position: relative; /* Allow absolutely positioned children */
+    overflow: hidden; /* Hide overflow from high-res image */
+    width: 200px; /* Set a fixed width, or set to match thumbnail width */
+    height: 150px; /* Appropriately set a fixed height */
+}
+
+.high-res {
+    display: none; /* Initially hidden */
+    position: absolute; /* For free positioning */
+    top: 0; /* Start from top of container */
+    left: 0; /* Start from left of container */
+    pointer-events: none; /* Prevent pointer events anywhere on the image */
+    width: auto; /* Allow natural size */
+    height: auto; /* Allow natural size */
+    max-width: none; /* Override max-width limiting */
+    max-height: none; /* Override max-height limiting */
 }

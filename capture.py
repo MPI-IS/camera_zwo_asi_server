@@ -1,11 +1,10 @@
-
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Optional, Tuple
-
+import time
 import camera_zwo_asi as zwo
 import cv2
 import nightskycam_focus as nf
@@ -79,6 +78,7 @@ def webcam_camera():
 
 
 def _dummy_capture() -> np.ndarray:
+    time.sleep(1.5)
     return np.random.randint(0, 256, (480, 640, 3), dtype=np.uint8)
 
 

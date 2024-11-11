@@ -1,11 +1,7 @@
 import logging
 import os
-from datetime import datetime
-
-import numpy as np
 from flask import (
     Blueprint,
-    abort,
     current_app,
     jsonify,
     render_template,
@@ -18,8 +14,8 @@ from capture import create_image
 camera_bp = Blueprint("camera", __name__)
 
 
-@camera_bp.route("/", methods=["GET"])
-def index():
+def get_thumbnails():
+    """Helper function to retrieve the list of thumbnails."""
     image_config = current_app.config["image_config"]
     thumbnails = []
     for filename in os.listdir(image_config.img_folder):
@@ -38,7 +34,19 @@ def index():
                     },
                 }
             )
+    return thumbnails
+
+
+@camera_bp.route("/", methods=["GET"])
+def index():
+    thumbnails = get_thumbnails()
     return render_template("index.html", images_info=thumbnails)
+
+
+@camera_bp.route("/images", methods=["GET"])
+def get_images():
+    thumbnails = get_thumbnails()
+    return jsonify({"images_info": thumbnails})
 
 
 @camera_bp.route("/capture", methods=["POST"])
@@ -99,26 +107,7 @@ def capture():
                 }
             )
 
-    # Fetch the updated list of thumbnails
-    thumbnails = []
-    for filename in os.listdir(image_config.img_folder):
-        if filename.startswith("thumbnail_") and filename.endswith(".jpeg"):
-            focus = filename.split("_")[-1].replace(".jpeg", "")
-            thumbnails.append(
-                {
-                    "thumbnail_filename": filename,
-                    "image_filename": filename.replace("thumbnail_", ""),
-                    "focus": focus,
-                    "config": {
-                        "exposure": "N/A",
-                        "gain": "N/A",
-                        "focus": focus,
-                        "aperture": "N/A",
-                    },
-                }
-            )
-
-    return jsonify(thumbnails)
+    return jsonify({"images_info": get_thumbnails()})
 
 
 @camera_bp.route("/media/<filename>")

@@ -9,18 +9,19 @@ $(document).ready(function() {
                 $('#thumbnails tbody').empty();
                 data.forEach(function(image) {
                     const row = $('<tr></tr>');
-                    const leftColumn = $('<td class="align-middle" style="width: 50%;"></td>');
-                    const rightColumn = $('<td class="align-middle" style="width: 50%;"></td>');
+                    const thumbnailColumn = $('<td class="align-middle"></td>');
+                    const highResColumn = $('<td class="align-middle high-res-container"></td>');
+                    const configColumn = $('<td class="align-middle"></td>');
 
                     if (image.error) {
-                        leftColumn.append('<div class="alert alert-danger">' + image.error + '</div>');
+                        thumbnailColumn.append('<div class="alert alert-danger">' + image.error + '</div>');
                     } else {
                         const thumbnail = $('<div class="thumbnail"></div>');
                         const link = $('<a></a>').attr('href', '/media/' + image.image_filename);
                         const img = $('<img>').attr('src', '/media/' + image.thumbnail_filename).attr('alt', 'Thumbnail').addClass('img-fluid');
                         link.append(img);
                         thumbnail.append(link);
-                        leftColumn.append(thumbnail);
+                        thumbnailColumn.append(thumbnail);
                     }
 
                     const configInfo = 'Exposure: ' + image.config.exposure + ', Gain: ' + image.config.gain;
@@ -30,10 +31,11 @@ $(document).ready(function() {
                     if (image.config.aperture !== null) {
                         configInfo += ', Aperture: ' + image.config.aperture;
                     }
-                    rightColumn.append('<div class="config">' + configInfo + '</div>');
+                    configColumn.append('<div class="config">' + configInfo + '</div>');
 
-                    row.append(leftColumn);
-                    row.append(rightColumn);
+                    row.append(thumbnailColumn);
+                    row.append(highResColumn);
+                    row.append(configColumn);
                     $('#thumbnails tbody').append(row);
                 });
                 addHoverEffect();
@@ -45,7 +47,8 @@ $(document).ready(function() {
         $('.thumbnail img').hover(function(event) {
             const thumbnail = $(this);
             const highResImg = $('<div class="high-res"><img src="/media/' + thumbnail.parent().attr('href').split('/').pop() + '"></div>');
-            thumbnail.parent().append(highResImg);
+            const highResContainer = thumbnail.closest('tr').find('.high-res-container');
+            highResContainer.append(highResImg);
             highResImg.fadeIn();
 
             thumbnail.on('mousemove', function(e) {
@@ -60,7 +63,7 @@ $(document).ready(function() {
                 });
             });
         }, function() {
-            $(this).siblings('.high-res').remove();
+            $(this).closest('tr').find('.high-res-container .high-res').remove();
         });
     }
 

@@ -23,8 +23,8 @@ def index():
     image_config = current_app.config["image_config"]
     thumbnails = []
     for filename in os.listdir(image_config.img_folder):
-        if filename.startswith("thumbnail_") and filename.endswith(".tiff"):
-            focus = filename.split("_")[-1].replace(".tiff", "")
+        if filename.startswith("thumbnail_") and filename.endswith(".jpeg"):
+            focus = filename.split("_")[-1].replace(".jpeg", "")
             thumbnails.append(
                 {
                     "thumbnail_filename": filename,

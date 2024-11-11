@@ -56,10 +56,17 @@
         <h2>Captured Images</h2>
         <div id="thumbnails" class="table-responsive">
             <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Thumbnail</th>
+                        <th>High Resolution</th>
+                        <th>Configuration</th>
+                    </tr>
+                </thead>
                 <tbody>
                     {% for image in images_info %}
                     <tr>
-                        <td class="align-middle" style="width: 50%;">
+                        <td class="align-middle">
                             {% if image.error %}
                                 <div class="alert alert-danger">{{ image.error }}</div>
                             {% else %}
@@ -70,7 +77,8 @@
                                 </div>
                             {% endif %}
                         </td>
-                        <td class="align-middle" style="width: 50%;">
+                        <td class="align-middle high-res-container"></td>
+                        <td class="align-middle">
                             <div class="config"> 
                                 Exposure: {{ image.config.exposure }}, Gain: {{ image.config.gain }}{% if image.config.focus is not none %}, Focus: {{ image.config.focus }}{% endif %}{% if image.config.aperture is not none %}, Aperture: {{ image.config.aperture }}{% endif %}
                             </div>

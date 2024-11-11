@@ -29,8 +29,8 @@
     <div id="thumbnails">
         {% for image in images_info %}
             <div class="thumbnail">
-                <a href="/download/{{ image.image_filename }}">
-                    <img src="/thumbnails/{{ image.thumbnail_filename }}" alt="Thumbnail">
+                <a href="{{ url_for('camera.serve_media', filename=image.image_filename) }}">
+                    <img src="{{ url_for('camera.serve_media', filename=image.thumbnail_filename) }}" alt="Thumbnail">
                 </a>
                 <div class="config">Exposure: {{ image.config.exposure }}, Gain: {{ image.config.gain }}, Focus: {{ image.config.focus }}, Aperture: {{ image.config.aperture }}</div>
             </div>

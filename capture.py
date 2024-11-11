@@ -1,14 +1,15 @@
-from datetime import datetime
-from pathlib import Path
-from enum import Enum
 from contextlib import contextmanager
-from typing import Optional, Tuple
-import cv2
 from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
+from pathlib import Path
+from typing import Optional, Tuple
+
+import camera_zwo_asi as zwo
+import cv2
+import nightskycam_focus as nf
 import numpy as np
 from PIL import Image
-import camera_zwo_asi as zwo
-import nightskycam_focus as nf
 
 
 class FocusAdapter:
@@ -109,7 +110,7 @@ def create_thumbnail(
     thumbnail.thumbnail(image_config.thumbnail)
     thumbnail_filename = f"thumbnail_{filename}"
     thumbnail_path = Path(image_config.img_folder) / thumbnail_filename
-    thumbnail.save(thumbnail_path, format="TIFF")
+    thumbnail.save(thumbnail_path, format="JPEG")
     return thumbnail_path
 
 
@@ -131,11 +132,11 @@ def create_image(
 
     timestamp = now.strftime("%Y%m%d_%H%M%S")
 
-    filename = f"{timestamp}.tiff"
+    filename = f"{timestamp}.jpeg"
     filepath = Path(image_config.img_folder) / filename
 
     image = Image.fromarray(image_array)
-    image.save(filepath, format="TIFF")
+    image.save(filepath, format="JPEG")
 
     thumbnail_path = create_thumbnail(image, image_config, filename)
 

@@ -1,16 +1,18 @@
-from datetime import datetime
-from flask import (
-    Blueprint,
-    request,
-    render_template,
-    jsonify,
-    send_from_directory,
-    current_app,
-)
-from capture import create_image
 import logging
 import os
+from datetime import datetime
+
 import numpy as np
+from flask import (
+    Blueprint,
+    current_app,
+    jsonify,
+    render_template,
+    request,
+    send_from_directory,
+)
+
+from capture import create_image
 
 camera_bp = Blueprint("camera", __name__)
 
@@ -85,13 +87,7 @@ def capture():
     return jsonify(images_info)
 
 
-@camera_bp.route("/thumbnails/<filename>")
-def serve_thumbnail(filename):
-    image_config = current_app.config["image_config"]
-    return send_from_directory(image_config.img_folder, filename)
-
-
-@camera_bp.route("/images/<filename>")
-def serve_image(filename):
+@camera_bp.route("/media/<filename>")
+def serve_media(filename):
     image_config = current_app.config["image_config"]
     return send_from_directory(image_config.img_folder, filename)

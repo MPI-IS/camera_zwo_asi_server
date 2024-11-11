@@ -9,8 +9,8 @@ $(document).ready(function() {
                 data.forEach(function(image) {
                     $('#thumbnails').append(
                         '<div class="thumbnail">' +
-                        '<a href="/download/' + image.image_filename + '">' +
-                        '<img src="/thumbnails/' + image.thumbnail_filename + '" alt="Thumbnail">' +
+                        '<a href="/media/' + image.image_filename + '">' +
+                        '<img src="/media/' + image.thumbnail_filename + '" alt="Thumbnail">' +
                         '</a>' +
                         '<div class="config">Exposure: ' + image.config.exposure + ', Gain: ' + image.config.gain + ', Focus: ' + image.config.focus + ', Aperture: ' + image.config.aperture + '</div>' +
                         '</div>'
@@ -24,7 +24,7 @@ $(document).ready(function() {
     function addHoverEffect() {
         $('.thumbnail img').hover(function(event) {
             const thumbnail = $(this);
-            const highResImg = $('<div class="high-res"><img src="/images/' + thumbnail.parent().attr('href').split('/').pop() + '"></div>');
+            const highResImg = $('<div class="high-res"><img src="/media/' + thumbnail.parent().attr('href').split('/').pop() + '"></div>');
             thumbnail.parent().append(highResImg);
             highResImg.fadeIn();
 

@@ -82,5 +82,4 @@ def capture():
 @camera_bp.route("/media/<filename>")
 def serve_media(filename):
     image_config = current_app.config["image_config"]
-    print("serve media:", image_config.img_folder, filename)
     return send_from_directory(image_config.img_folder, filename)

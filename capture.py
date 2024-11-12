@@ -78,7 +78,7 @@ class ImageInfo:
             image_infos.append(image_info)
 
         # Sort image_infos by timestamp
-        image_infos.sort(key=lambda x: x.timestamp)
+        image_infos.sort(key=lambda x: x.timestamp, reverse=True)
 
         return image_infos
 

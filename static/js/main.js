@@ -57,7 +57,7 @@ $(document).ready(function() {
     });
 
     function addHoverEffect() {
-	$('.thumbnail img').hover(function() {
+        $('.thumbnail img').hover(function() {
             const thumbnail = $(this);
             const fullResImgSrc = thumbnail.parent().attr('href').replace('thumbnail_', ''); // Full-resolution image path
 
@@ -66,9 +66,9 @@ $(document).ready(function() {
 
             // Create the high-resolution image element
             const highResImg = $('<img>')
-		  .attr('src', fullResImgSrc)
-		  .attr('alt', 'High Resolution')
-		  .addClass('high-res');
+                .attr('src', fullResImgSrc)
+                .attr('alt', 'High Resolution')
+                .addClass('high-res');
 
             // Append the high-resolution image to the corresponding high-res container
             const highResContainer = thumbnail.closest('tr').find('.high-res-container');
@@ -77,27 +77,28 @@ $(document).ready(function() {
 
             // Adjust position based on mouse movement
             thumbnail.on('mousemove', function(e) {
-		const offset = thumbnail.offset();
-		const x = e.pageX - offset.left;     // Get mouse x relative to the thumbnail
-		const y = e.pageY - offset.top;      // Get mouse y relative to the thumbnail
+                const offset = thumbnail.offset();
+                const x = e.pageX - offset.left;     // Get mouse x relative to the thumbnail
+                const y = e.pageY - offset.top;      // Get mouse y relative to the thumbnail
 
-		// Scale the position based on the high-res image and thumbnail size
-		const scaleFactor = highResImg.width() / thumbnail.width();
-		const newLeft = -(x * scaleFactor - (highResImg.width() / 2));
-		const newTop = -(y * scaleFactor - (highResImg.height() / 2));
+                // Scale the position based on the high-res image and thumbnail size
+                const scaleFactorX = highResImg.width() / thumbnail.width();
+                const scaleFactorY = highResImg.height() / thumbnail.height();
+                const newLeft = -(x * scaleFactorX - (highResContainer.width() / 2));
+                const newTop = -(y * scaleFactorY - (highResContainer.height() / 2));
 
-		// Move the high-res image based on calculated positions
-		highResImg.css({
+                // Move the high-res image based on calculated positions
+                highResImg.css({
                     left: newLeft + 'px',
                     top: newTop + 'px',
                     position: 'absolute'
-		});
+                });
             });
 
-	}, function() {
+        }, function() {
             // Clear the high-res image when the mouse leaves
             $(this).closest('tr').find('.high-res-container').empty();
-	});
+        });
     }
     
 

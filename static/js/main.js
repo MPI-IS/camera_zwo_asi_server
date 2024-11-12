@@ -12,8 +12,10 @@ $(document).ready(function() {
                         const thumbnailColumn = $('<td class="align-middle"></td>');
                         const highResColumn = $('<td class="align-middle high-res-container"></td>');
                         const configColumn = $('<td class="align-middle"></td>');
-                        if (image.error) {
-                            thumbnailColumn.append('<div class="alert alert-danger">' + image.error + '</div>');
+                        
+                        if (image.meta.error) {
+                            // Display error message if present
+                            thumbnailColumn.append('<div class="alert alert-danger">' + image.meta.error + '</div>');
                         } else {
                             const thumbnail = $('<div class="thumbnail"></div>');
                             const link = $('<a></a>').attr('href', '/media/' + image.image);
@@ -25,6 +27,7 @@ $(document).ready(function() {
                             const highResImg = $('<img>').attr('src', '/media/' + image.image).attr('alt', 'High Resolution').addClass('img-fluid high-res');
                             highResColumn.append(highResImg);
                         }
+
                         let configInfo = 'Exposure: ' + image.meta.exposure + '<br>Gain: ' + image.meta.gain;
                         if (image.meta.focus !== null) {
                             configInfo += '<br>Focus: ' + image.meta.focus;
@@ -100,7 +103,6 @@ $(document).ready(function() {
             $(this).closest('tr').find('.high-res-container').empty();
         });
     }
-    
 
     loadImages(); // Initial load of images
 });

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
+from threading import Lock
 from typing import List, Optional, Tuple
 
 import camera_zwo_asi as zwo
@@ -146,6 +147,7 @@ def webcam_camera():
         yield camera
     finally:
         camera.release()
+        time.sleep(1.0)
 
 
 def _dummy_capture() -> np.ndarray:
@@ -184,11 +186,16 @@ def _zwo_asi_capture(camera_config: CameraConfig) -> np.ndarray:
     return camera.capture().get_image()
 
 
+_capture_lock = Lock()
+
+
 def create_image(
     camera_config: CameraConfig,
     image_config: ImageConfig,
     now: Optional[datetime] = None,
 ) -> None:
+
+    global _capture_lock
 
     image_meta = ImageMeta(
         focus=camera_config.focus,
@@ -203,17 +210,18 @@ def create_image(
     filename_base = f"{timestamp}"
     meta_filepath = Path(image_config.img_folder) / f"meta_{filename_base}.toml"
 
-    try:
-        image_array: np.ndarray
-        if camera_config.camera_type == CameraType.dummy:
-            image_array = _dummy_capture()
-        # if camera_config.camera_type == Camera2Type.webcam:
-        else:
-            image_array = _webcam_capture()
-    except Exception as e:
-        image_meta.error = str(e)
-        image_meta.serialize_to_toml(meta_filepath)
-        return
+    with _capture_lock:
+        try:
+            image_array: np.ndarray
+            if camera_config.camera_type == CameraType.dummy:
+                image_array = _dummy_capture()
+            # if camera_config.camera_type == Camera2Type.webcam:
+            else:
+                image_array = _webcam_capture()
+        except Exception as e:
+            image_meta.error = str(e)
+            image_meta.serialize_to_toml(meta_filepath)
+            return
 
     try:
         image = Image.fromarray(image_array)

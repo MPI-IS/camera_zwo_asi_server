@@ -67,8 +67,8 @@
                     {% for image in images_info %}
                     <tr>
                         <td class="align-middle">
-                            {% if image.error %}
-                                <div class="alert alert-danger">{{ image.error }}</div>
+                            {% if image.meta.error %}
+                                <div class="alert alert-danger">{{ image.meta.error }}</div>
                             {% else %}
                                 <div class="thumbnail">
                                     <a href="{{ url_for('camera.serve_media', filename=image.image) }}">

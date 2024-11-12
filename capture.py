@@ -59,7 +59,9 @@ class ImageInfo:
     timestamp: datetime
 
     @classmethod
-    def from_folder(cls, folder_path: Path) -> List["ImageInfo"]:
+    def from_folder(
+        cls, folder_path: Path, max_images: Optional[int] = 10
+    ) -> List["ImageInfo"]:
         image_infos = []
 
         for toml_file in folder_path.glob("meta_*.toml"):
@@ -81,7 +83,31 @@ class ImageInfo:
         # Sort image_infos by timestamp
         image_infos.sort(key=lambda x: x.timestamp, reverse=True)
 
-        return image_infos
+        # If max_images is specified and there are more than max_images, delete the older images
+        if max_images is not None and len(image_infos) > max_images:
+            cls.cleanup(folder_path, image_infos, max_images)
+
+        return image_infos[:max_images]
+
+    @staticmethod
+    def cleanup(
+        folder_path: Path, image_infos: List["ImageInfo"], max_images: int
+    ) -> None:
+        for image_info in image_infos[max_images:]:
+            if image_info.image:
+                image_file_path = folder_path / image_info.image
+                if image_file_path.exists():
+                    image_file_path.unlink()
+            if image_info.thumbnail:
+                thumbnail_file_path = folder_path / image_info.thumbnail
+                if thumbnail_file_path.exists():
+                    thumbnail_file_path.unlink()
+            toml_file_path = (
+                folder_path
+                / f"meta_{image_info.timestamp.strftime('%Y%m%d_%H%M%S')}.toml"
+            )
+            if toml_file_path.exists():
+                toml_file_path.unlink()
 
     def to_dict(self) -> dict:
         return {

@@ -25,12 +25,12 @@ $(document).ready(function() {
                             const highResImg = $('<img>').attr('src', '/media/' + image.image).attr('alt', 'High Resolution').addClass('img-fluid high-res');
                             highResColumn.append(highResImg);
                         }
-                        let configInfo = 'Exposure: ' + image.meta.exposure + ', Gain: ' + image.meta.gain;
+                        let configInfo = 'Exposure: ' + image.meta.exposure + '<br>Gain: ' + image.meta.gain;
                         if (image.meta.focus !== null) {
-                            configInfo += ', Focus: ' + image.meta.focus;
+                            configInfo += '<br>Focus: ' + image.meta.focus;
                         }
                         if (image.meta.aperture !== null) {
-                            configInfo += ', Aperture: ' + image.meta.aperture;
+                            configInfo += '<br>Aperture: ' + image.meta.aperture;
                         }
                         configColumn.append('<div class="config">' + configInfo + '</div>');
                         row.append(thumbnailColumn, highResColumn, configColumn);

@@ -16,9 +16,22 @@ input[type="number"] {
     width: 100px;
 }
 
-.table td, .table th {
-    padding: 0; /* Remove padding from table cells */
-    border: none; /* Optional: Remove borders if not needed */
+.table {
+    table-layout: auto; /* Allow the table to adjust column widths based on content */
+    width: auto; /* Remove full width constraint */
+    border-collapse: collapse; /* Ensure borders are collapsed */
+    border: 2px solid #444; /* Add a border around the entire table */
+}
+
+.table th, .table td {
+    border: 1px solid #444; /* Add a border to each table cell */
+    padding: 8px; /* Add padding for better spacing */
+    vertical-align: middle; /* Vertically center the content */
+}
+
+.table th {
+    background-color: #f2f2f2; /* Light grey background for headers */
+    text-align: center; /* Center align text in headers */
 }
 
 .thumbnail {
@@ -28,11 +41,10 @@ input[type="number"] {
     position: relative;
 }
 
-.thumbnail img, .high-res {
+.thumbnail img {
     display: block; /* Ensure the image takes full width of the container */
-    width: 100%; /* Set width to 100% to match the container */
+    width: auto; /* Allow the image to display at its natural size */
     height: auto; /* Maintain aspect ratio */
-    max-width: 200px; /* Ensure it doesn't overflow the container */
     border: 1px solid #ccc;
     cursor: pointer;
 }
@@ -40,6 +52,8 @@ input[type="number"] {
 .config {
     font-size: 0.9em;
     color: #555;
+    text-align: center; /* Center align text horizontally */
+    white-space: pre-line; /* Preserve line breaks in the text */
 }
 
 .high-res-container {

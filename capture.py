@@ -1,15 +1,94 @@
+import logging
+import time
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Tuple
-import time
+from typing import List, Optional, Tuple
+
 import camera_zwo_asi as zwo
 import cv2
 import nightskycam_focus as nf
 import numpy as np
+import toml
 from PIL import Image
+
+# Get the logger configured in app.py
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class ImageMeta:
+    focus: Optional[int]
+    aperture: Optional[int]
+    exposure: int
+    gain: int
+    error: Optional[str]
+
+    def serialize_to_toml(self, file_path: Path) -> None:
+        data = {k: v for k, v in self.__dict__.items() if v is not None}
+        with file_path.open("w") as f:
+            toml.dump(data, f)
+
+    @classmethod
+    def from_toml(cls, file_path: Path) -> "ImageMeta":
+        with file_path.open("r") as f:
+            data = toml.load(f)
+        for opt_attr in ("focus", "aperture", "error"):
+            if opt_attr not in data:
+                data[opt_attr] = None
+        return cls(**data)
+
+    def to_dict(self) -> dict:
+        return {
+            "focus": self.focus,
+            "aperture": self.aperture,
+            "exposure": self.exposure,
+            "gain": self.gain,
+            "error": self.error,
+        }
+
+
+@dataclass
+class ImageInfo:
+    image: Optional[str]
+    thumbnail: Optional[str]
+    meta: ImageMeta
+    timestamp: datetime
+
+    @classmethod
+    def from_folder(cls, folder_path: Path) -> List["ImageInfo"]:
+        image_infos = []
+
+        for toml_file in folder_path.glob("meta_*.toml"):
+            timestamp_str = toml_file.stem.replace("meta_", "")
+            image_file = str(folder_path / f"{timestamp_str}.jpeg")
+            thumbnail_file = str(folder_path / f"thumbnail_{timestamp_str}.jpeg")
+
+            meta = ImageMeta.from_toml(toml_file)
+            image_info = cls(
+                image=Path(image_file).name if Path(image_file).exists() else None,
+                thumbnail=(
+                    Path(thumbnail_file).name if Path(thumbnail_file).exists() else None
+                ),
+                meta=meta,
+                timestamp=datetime.strptime(timestamp_str, "%Y%m%d_%H%M%S"),
+            )
+            image_infos.append(image_info)
+
+        # Sort image_infos by timestamp
+        image_infos.sort(key=lambda x: x.timestamp)
+
+        return image_infos
+
+    def to_dict(self) -> dict:
+        return {
+            "image": self.image,
+            "thumbnail": self.thumbnail,
+            "meta": self.meta.to_dict(),
+            "timestamp": self.timestamp.isoformat(),
+        }
 
 
 class FocusAdapter:
@@ -60,14 +139,6 @@ class CameraConfig:
     aperture: Optional[int] = None
 
 
-@dataclass
-class ImageInfo:
-    filepath: Path
-    thumbnail: Path
-    camera_config: CameraConfig
-    timestamp: str
-
-
 @contextmanager
 def webcam_camera():
     camera = cv2.VideoCapture(0)
@@ -113,46 +184,51 @@ def _zwo_asi_capture(camera_config: CameraConfig) -> np.ndarray:
     return camera.capture().get_image()
 
 
-def create_thumbnail(
-    image: Image, image_config: ImageConfig, filename: str  # type: ignore
-) -> Path:
-    thumbnail = image.copy()  # type: ignore
-    thumbnail.thumbnail(image_config.thumbnail)
-    thumbnail_filename = f"thumbnail_{filename}"
-    thumbnail_path = Path(image_config.img_folder) / thumbnail_filename
-    thumbnail.save(thumbnail_path, format="JPEG")
-    return thumbnail_path
-
-
 def create_image(
     camera_config: CameraConfig,
     image_config: ImageConfig,
     now: Optional[datetime] = None,
-) -> ImageInfo:
+) -> None:
 
-    image_array: np.ndarray
-    if camera_config.camera_type == CameraType.dummy:
-        image_array = _dummy_capture()
-    # if camera_config.camera_type == Camera2Type.webcam:
-    else:
-        image_array = _webcam_capture()
-
+    image_meta = ImageMeta(
+        focus=camera_config.focus,
+        aperture=camera_config.aperture,
+        gain=camera_config.gain,
+        exposure=camera_config.exposure,
+        error=None,
+    )
     if now is None:
         now = datetime.now()
-
     timestamp = now.strftime("%Y%m%d_%H%M%S")
+    filename_base = f"{timestamp}"
+    meta_filepath = Path(image_config.img_folder) / f"meta_{filename_base}.toml"
 
-    filename = f"{timestamp}.jpeg"
-    filepath = Path(image_config.img_folder) / filename
+    try:
+        image_array: np.ndarray
+        if camera_config.camera_type == CameraType.dummy:
+            image_array = _dummy_capture()
+        # if camera_config.camera_type == Camera2Type.webcam:
+        else:
+            image_array = _webcam_capture()
+    except Exception as e:
+        image_meta.error = str(e)
+        image_meta.serialize_to_toml(meta_filepath)
+        return
 
-    image = Image.fromarray(image_array)
-    image.save(filepath, format="JPEG")
+    try:
+        image = Image.fromarray(image_array)
+        image.save(
+            Path(image_config.img_folder) / f"{filename_base}.jpeg", format="JPEG"
+        )
+        thumbnail = image.copy()  # type: ignore
+        thumbnail.thumbnail(image_config.thumbnail)
+        thumbnail.save(
+            Path(image_config.img_folder) / f"thumbnail_{filename_base}.jpeg",
+            format="JPEG",
+        )
+    except Exception as e:
+        image_meta.error = str(e)
+        image_meta.serialize_to_toml(meta_filepath)
+        return
 
-    thumbnail_path = create_thumbnail(image, image_config, filename)
-
-    return ImageInfo(
-        filepath=filepath,
-        thumbnail=thumbnail_path,
-        camera_config=camera_config,
-        timestamp=timestamp,
-    )
+    image_meta.serialize_to_toml(meta_filepath)

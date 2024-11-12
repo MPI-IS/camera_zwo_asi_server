@@ -12,33 +12,28 @@ $(document).ready(function() {
                         const thumbnailColumn = $('<td class="align-middle"></td>');
                         const highResColumn = $('<td class="align-middle high-res-container"></td>');
                         const configColumn = $('<td class="align-middle"></td>');
-
                         if (image.error) {
                             thumbnailColumn.append('<div class="alert alert-danger">' + image.error + '</div>');
                         } else {
                             const thumbnail = $('<div class="thumbnail"></div>');
-                            const link = $('<a></a>').attr('href', '/media/' + image.image_filename);
-                            const img = $('<img>').attr('src', '/media/' + image.thumbnail_filename).attr('alt', 'Thumbnail').addClass('img-fluid');
+                            const link = $('<a></a>').attr('href', '/media/' + image.image);
+                            const img = $('<img>').attr('src', '/media/' + image.thumbnail).attr('alt', 'Thumbnail').addClass('img-fluid');
                             link.append(img);
                             thumbnail.append(link);
                             thumbnailColumn.append(thumbnail);
 
-                            const highResImg = $('<img>').attr('src', '/media/' + image.image_filename).attr('alt', 'High Resolution').addClass('img-fluid high-res');
+                            const highResImg = $('<img>').attr('src', '/media/' + image.image).attr('alt', 'High Resolution').addClass('img-fluid high-res');
                             highResColumn.append(highResImg);
                         }
-
-                        let configInfo = 'Exposure: ' + image.config.exposure + ', Gain: ' + image.config.gain;
-                        if (image.config.focus !== null) {
-                            configInfo += ', Focus: ' + image.config.focus;
+                        let configInfo = 'Exposure: ' + image.meta.exposure + ', Gain: ' + image.meta.gain;
+                        if (image.meta.focus !== null) {
+                            configInfo += ', Focus: ' + image.meta.focus;
                         }
-                        if (image.config.aperture !== null) {
-                            configInfo += ', Aperture: ' + image.config.aperture;
+                        if (image.meta.aperture !== null) {
+                            configInfo += ', Aperture: ' + image.meta.aperture;
                         }
                         configColumn.append('<div class="config">' + configInfo + '</div>');
-
-                        row.append(thumbnailColumn);
-                        row.append(highResColumn);
-                        row.append(configColumn);
+                        row.append(thumbnailColumn, highResColumn, configColumn);
                         $('#thumbnails tbody').append(row);
                     });
                     addHoverEffect();

@@ -1,5 +1,11 @@
 import logging
 import os
+import re
+from datetime import datetime
+from pathlib import Path
+from typing import List
+
+import toml
 from flask import (
     Blueprint,
     current_app,
@@ -9,31 +15,19 @@ from flask import (
     send_from_directory,
 )
 
-from capture import create_image
+from capture import ImageInfo, create_image
 
 camera_bp = Blueprint("camera", __name__)
 
+# Get the logger configured in app.py
+logger = logging.getLogger(__name__)
 
-def get_thumbnails():
-    """Helper function to retrieve the list of thumbnails."""
+
+def get_thumbnails() -> List[ImageInfo]:
+    """Helper function to retrieve the list of thumbnails sorted by timestamp."""
     image_config = current_app.config["image_config"]
-    thumbnails = []
-    for filename in os.listdir(image_config.img_folder):
-        if filename.startswith("thumbnail_") and filename.endswith(".jpeg"):
-            focus = filename.split("_")[-1].replace(".jpeg", "")
-            thumbnails.append(
-                {
-                    "thumbnail_filename": filename,
-                    "image_filename": filename.replace("thumbnail_", ""),
-                    "focus": focus,
-                    "config": {
-                        "exposure": "N/A",
-                        "gain": "N/A",
-                        "focus": focus,
-                        "aperture": "N/A",
-                    },
-                }
-            )
+    thumbnails: List[ImageInfo] = ImageInfo.from_folder(Path(image_config.img_folder))
+    logger.info(f"retrieved {len(thumbnails)} images")
     return thumbnails
 
 
@@ -46,7 +40,7 @@ def index():
 @camera_bp.route("/images", methods=["GET"])
 def get_images():
     thumbnails = get_thumbnails()
-    return jsonify({"images_info": thumbnails})
+    return jsonify({"images_info": [thumbnail.to_dict() for thumbnail in thumbnails]})
 
 
 @camera_bp.route("/capture", methods=["POST"])
@@ -63,8 +57,6 @@ def capture():
     else:
         focus_values = np.arange(focus_min, focus_max + focus_step, focus_step)
 
-    images_info = []
-
     camera_config = current_app.config["default_camera_config"]
     image_config = current_app.config["image_config"]
 
@@ -75,36 +67,13 @@ def capture():
         camera_config.aperture = aperture
 
         try:
-            image_info = create_image(camera_config, image_config)
-            images_info.append(
-                {
-                    "focus": focus,
-                    "thumbnail_filename": image_info.thumbnail.name,
-                    "image_filename": image_info.filepath.name,
-                    "config": {
-                        "exposure": exposure,
-                        "gain": gain,
-                        "focus": focus,
-                        "aperture": aperture,
-                    },
-                }
+            create_image(camera_config, image_config)
+            logger.info(
+                f"Image captured successfully with focus: {focus}, exposure: {exposure}, gain: {gain}, aperture: {aperture}"
             )
-            logging.info(f"Image and thumbnail saved for focus {focus}")
         except Exception as e:
-            logging.error(f"Failed to capture image for focus {focus}: {e}")
-            images_info.append(
-                {
-                    "focus": focus,
-                    "thumbnail_filename": None,
-                    "image_filename": None,
-                    "config": {
-                        "exposure": exposure,
-                        "gain": gain,
-                        "focus": focus,
-                        "aperture": aperture,
-                    },
-                    "error": str(e),
-                }
+            logger.error(
+                f"Failed to capture image with focus: {focus}, exposure: {exposure}, gain: {gain}, aperture: {aperture}. Error: {e}"
             )
 
     return jsonify({"images_info": get_thumbnails()})
@@ -113,4 +82,5 @@ def capture():
 @camera_bp.route("/media/<filename>")
 def serve_media(filename):
     image_config = current_app.config["image_config"]
+    print("serve media:", image_config.img_folder, filename)
     return send_from_directory(image_config.img_folder, filename)

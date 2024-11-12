@@ -71,8 +71,8 @@
                                 <div class="alert alert-danger">{{ image.error }}</div>
                             {% else %}
                                 <div class="thumbnail">
-                                    <a href="{{ url_for('camera.serve_media', filename=image.image_filename) }}">
-                                        <img src="{{ url_for('camera.serve_media', filename=image.thumbnail_filename) }}" alt="Thumbnail" class="img-fluid">
+                                    <a href="{{ url_for('camera.serve_media', filename=image.image) }}">
+                                        <img src="{{ url_for('camera.serve_media', filename=image.thumbnail) }}" alt="Thumbnail" class="img-fluid">
                                     </a>
                                 </div>
                             {% endif %}
@@ -80,7 +80,7 @@
                         <td class="align-middle high-res-container"></td>
                         <td class="align-middle">
                             <div class="config"> 
-                                Exposure: {{ image.config.exposure }}, Gain: {{ image.config.gain }}{% if image.config.focus is not none %}, Focus: {{ image.config.focus }}{% endif %}{% if image.config.aperture is not none %}, Aperture: {{ image.config.aperture }}{% endif %}
+                                Exposure: {{ image.meta.exposure }}, Gain: {{ image.meta.gain }}{% if image.meta.focus is not none %}, Focus: {{ image.meta.focus }}{% endif %}{% if image.meta.aperture is not none %}, Aperture: {{ image.meta.aperture }}{% endif %}
                             </div>
                         </td>
                     </tr>

@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 
@@ -43,6 +44,12 @@ def create_app() -> Flask:
     app.config["default_camera_config"] = _get_default_config()
     app.config["image_config"] = _get_image_config()
     app.register_blueprint(camera_bp)
+
+    # Set up logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    logger.info("Flask application starting up.")
+
     return app
 
 

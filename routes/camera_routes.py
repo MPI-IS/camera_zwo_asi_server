@@ -45,12 +45,12 @@ def get_images():
 
 @camera_bp.route("/capture", methods=["POST"])
 def capture():
-    exposure = request.form.get("exposure", type=float)
-    gain = request.form.get("gain", type=float)
-    focus_min = request.form.get("focus_min", type=float)
-    focus_max = request.form.get("focus_max", type=float)
-    focus_step = request.form.get("focus_step", type=float)
-    aperture = request.form.get("aperture", type=float)
+    exposure = request.form.get("exposure", type=int)
+    gain = request.form.get("gain", type=int)
+    focus_min = request.form.get("focus_min", type=int)
+    focus_max = request.form.get("focus_max", type=int)
+    focus_step = request.form.get("focus_step", type=int)
+    aperture = request.form.get("aperture", type=int)
 
     if focus_max is None or focus_step is None:
         focus_values = [focus_min]

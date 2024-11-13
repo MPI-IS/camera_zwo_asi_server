@@ -209,7 +209,11 @@ def _zwo_asi_capture(camera_config: CameraConfig) -> np.ndarray:
     camera.set_roi(roi)
     FocusAdapter.focus(camera_config.focus)
     FocusAdapter.aperture(camera_config.aperture)
-    return camera.capture().get_image()
+    logger.info(
+        f"starting zwo-asi camera capture (exposure: {camera_config.exposure*1e-6:.2f} seconds)"
+    )
+    img = camera.capture().get_image()
+    return img
 
 
 _capture_lock = Lock()
@@ -241,7 +245,8 @@ def create_image(
             image_array: np.ndarray
             if camera_config.camera_type == CameraType.dummy:
                 image_array = _dummy_capture()
-            # if camera_config.camera_type == Camera2Type.webcam:
+            elif camera_config.camera_type == CameraType.zwo_asi:
+                image_array = _zwo_asi_capture(camera_config)
             else:
                 image_array = _webcam_capture()
         except Exception as e:

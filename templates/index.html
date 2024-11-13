@@ -20,30 +20,30 @@
                 <tbody>
                     <tr>
                         <td><label for="exposure">Exposure:</label></td>
-                        <td><input type="number" name="exposure" step="0.1" value="{{ config.default_camera_config.exposure }}" required></td>
+                        <td><input type="number" name="exposure" value="{{ config.default_camera_config.exposure }}" required step="1"></td>
                     </tr>
                     <tr>
                         <td><label for="gain">Gain:</label></td>
-                        <td><input type="number" name="gain" step="0.1" value="{{ config.default_camera_config.gain }}" required></td>
+                        <td><input type="number" name="gain" value="{{ config.default_camera_config.gain }}" required step="1"></td>
                     </tr>
                     {% if config.default_camera_config.focus is not none %}
                     <tr>
                         <td><label for="focus_min">Focus Min:</label></td>
-                        <td><input type="number" name="focus_min" step="0.1" value="{{ config.default_camera_config.focus or 0 }}" required></td>
+                        <td><input type="number" name="focus_min" value="{{ config.default_camera_config.focus or 0 }}" required step="1"></td>
                     </tr>
                     <tr>
                         <td><label for="focus_max">Focus Max (optional):</label></td>
-                        <td><input type="number" name="focus_max" step="0.1"></td>
+                        <td><input type="number" name="focus_max" step="1"></td>
                     </tr>
                     <tr>
                         <td><label for="focus_step">Focus Step (optional):</label></td>
-                        <td><input type="number" name="focus_step" step="0.1"></td>
+                        <td><input type="number" name="focus_step" step="1"></td>
                     </tr>
                     {% endif %}
                     {% if config.default_camera_config.aperture is not none %}
                     <tr>
                         <td><label for="aperture">Aperture:</label></td>
-                        <td><input type="number" name="aperture" step="0.1" value="{{ config.default_camera_config.aperture or 0 }}" required></td>
+                        <td><input type="number" name="aperture" value="{{ config.default_camera_config.aperture or 0 }}" required step="1"></td>
                     </tr>
                     {% endif %}
                     <tr>

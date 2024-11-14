@@ -57,10 +57,13 @@ def capture():
     if focus_max is None or focus_step is None:
         focus_values = [focus_min]
     else:
-        focus_values = [
-            focus_min + i * focus_step
-            for i in range((focus_max - focus_min) // focus_step + 1)
-        ]
+        if focus_step <= 0:
+            focus_values = [focus_min]
+        else:
+            focus_values = [
+                focus_min + i * focus_step
+                for i in range((focus_max - focus_min) // focus_step + 1)
+            ]
 
     camera_config = current_app.config["default_camera_config"]
     image_config = current_app.config["image_config"]

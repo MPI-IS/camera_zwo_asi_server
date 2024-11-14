@@ -14,13 +14,20 @@
     </div>
     
     <div class="container mt-4">
+        <div class="alert alert-warning text-center">
+            Visit <a href="https://192.124.27.162/snapshots" target="_blank">https://192.124.27.162/snapshots</a> to pause the nightskycam service first (this functionality will soon be integrated in this page).
+        </div>
         <div class="mt-4">
             <button id="init-adapter" class="btn btn-success">Activate Adapter</button>
             <button id="close-adapter" class="btn btn-danger">Close Adapter</button>
             <div id="adapter-message" class="mt-2"></div>
             <ul class="text-muted small">
                 <li>before taking picture, activate the adapter</li>
+                <li>it takes around 5 seconds for the adapter to activate</li>
+                <li>the capture will try to activate the adapter if it has not been activated, but related error messages may be silent</li>
                 <li>close the adapter to fix the focus at the value of the latest captured picture</li>
+                <li>try to close and re-activate the adapter if captures fail</li>
+                <li>(re)activating the adapter will unfocus the system, even if no new image is captured</li>
             </ul>
         </div>
         <br>

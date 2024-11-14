@@ -12,10 +12,12 @@ $(document).ready(function() {
                         const thumbnailColumn = $('<td class="align-middle"></td>');
                         const highResColumn = $('<td class="align-middle high-res-container"></td>');
                         const configColumn = $('<td class="align-middle"></td>');
-                        
                         if (image.meta.error) {
                             // Display error message if present
                             thumbnailColumn.append('<div class="alert alert-danger">' + image.meta.error + '</div>');
+                        } else if (image.meta.waiting) {
+                            // Display "waiting for image" if image is waiting
+                            thumbnailColumn.append('<div class="alert alert-info">waiting for image</div>');
                         } else {
                             const thumbnail = $('<div class="thumbnail"></div>');
                             const link = $('<a></a>').attr('href', '/media/' + image.image);
@@ -49,12 +51,18 @@ $(document).ready(function() {
 
     $('form').on('submit', function(event) {
         event.preventDefault();
+        const captureButton = $(this).find('input[type="submit"]');
+        captureButton.prop('disabled', true); // Disable the button
+
         $.ajax({
             url: '/capture',
             method: 'POST',
             data: $(this).serialize(),
             success: function() {
                 loadImages(); // Reload images after capture
+                setTimeout(() => {
+                    captureButton.prop('disabled', false); // Re-enable the button after 1 second
+                }, 1000);
             }
         });
     });
@@ -104,5 +112,12 @@ $(document).ready(function() {
         });
     }
 
+    function pollForNewImages() {
+        setInterval(function() {
+            loadImages(); // Reload images periodically
+        }, 5000); // Poll every 5 seconds
+    }
+
     loadImages(); // Initial load of images
+    pollForNewImages(); // Start polling for new images
 });

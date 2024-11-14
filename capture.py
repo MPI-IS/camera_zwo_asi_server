@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from threading import Lock
+from queue import Queue
+from threading import Lock, Thread
 from typing import List, Optional, Tuple
 
 import camera_zwo_asi as zwo
@@ -25,7 +26,10 @@ class ImageMeta:
     aperture: Optional[int]
     exposure: int
     gain: int
+    waiting: bool
     error: Optional[str]
+    selfpath: str
+    filename_base: str
 
     def serialize_to_toml(self, file_path: Path) -> None:
         data = {k: v for k, v in self.__dict__.items() if v is not None}
@@ -47,7 +51,10 @@ class ImageMeta:
             "aperture": self.aperture,
             "exposure": self.exposure,
             "gain": self.gain,
+            "waiting": self.waiting,
             "error": self.error,
+            "selfpath": self.selfpath,
+            "filename_base": self.filename_base,
         }
 
 
@@ -213,6 +220,7 @@ def _zwo_asi_capture(camera_config: CameraConfig) -> np.ndarray:
         f"starting zwo-asi camera capture (exposure: {camera_config.exposure*1e-6:.2f} seconds)"
     )
     img = camera.capture().get_image()
+    time.sleep(1.0)
     return img
 
 
@@ -222,23 +230,11 @@ _capture_lock = Lock()
 def create_image(
     camera_config: CameraConfig,
     image_config: ImageConfig,
-    now: Optional[datetime] = None,
+    image_meta: ImageMeta,
+    queue: Optional[Queue] = None,
 ) -> None:
 
     global _capture_lock
-
-    image_meta = ImageMeta(
-        focus=camera_config.focus,
-        aperture=camera_config.aperture,
-        gain=camera_config.gain,
-        exposure=camera_config.exposure,
-        error=None,
-    )
-    if now is None:
-        now = datetime.now()
-    timestamp = now.strftime("%Y%m%d_%H%M%S")
-    filename_base = f"{timestamp}"
-    meta_filepath = Path(image_config.img_folder) / f"meta_{filename_base}.toml"
 
     with _capture_lock:
         try:
@@ -250,24 +246,33 @@ def create_image(
             else:
                 image_array = _webcam_capture()
         except Exception as e:
+            image_meta.waiting = False
             image_meta.error = str(e)
-            image_meta.serialize_to_toml(meta_filepath)
+            image_meta.serialize_to_toml(Path(image_meta.selfpath))
             return
 
     try:
         image = Image.fromarray(image_array)
         image.save(
-            Path(image_config.img_folder) / f"{filename_base}.jpeg", format="JPEG"
+            Path(image_config.img_folder) / f"{image_meta.filename_base}.jpeg",
+            format="JPEG",
         )
         thumbnail = image.copy()  # type: ignore
         thumbnail.thumbnail(image_config.thumbnail)
         thumbnail.save(
-            Path(image_config.img_folder) / f"thumbnail_{filename_base}.jpeg",
+            Path(image_config.img_folder)
+            / f"thumbnail_{image_meta.filename_base}.jpeg",
             format="JPEG",
         )
     except Exception as e:
+        image_meta.waiting = False
         image_meta.error = str(e)
-        image_meta.serialize_to_toml(meta_filepath)
+        image_meta.serialize_to_toml(Path(image_meta.selfpath))
         return
 
-    image_meta.serialize_to_toml(meta_filepath)
+    image_meta.waiting = False
+    image_meta.serialize_to_toml(Path(image_meta.selfpath))
+
+    # Notify the queue when an image is created
+    if queue is not None:
+        queue.put("Image created")

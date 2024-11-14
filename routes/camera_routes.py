@@ -1,8 +1,10 @@
 import logging
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
+from queue import Queue
+from threading import Thread
 from typing import List
 
 import toml
@@ -15,7 +17,7 @@ from flask import (
     send_from_directory,
 )
 
-from capture import ImageInfo, create_image
+from capture import ImageInfo, ImageMeta, create_image
 
 camera_bp = Blueprint("camera", __name__)
 
@@ -55,28 +57,65 @@ def capture():
     if focus_max is None or focus_step is None:
         focus_values = [focus_min]
     else:
-        focus_values = np.arange(focus_min, focus_max + focus_step, focus_step)
+        focus_values = [
+            focus_min + i * focus_step
+            for i in range((focus_max - focus_min) // focus_step + 1)
+        ]
 
     camera_config = current_app.config["default_camera_config"]
     image_config = current_app.config["image_config"]
 
+    # Create a queue for notifications
+    image_creation_queue = Queue()
+
+    focus_meta = {}
+
+    ts = datetime.now()
     for focus in focus_values:
-        camera_config.focus = focus
-        camera_config.exposure = exposure
-        camera_config.gain = gain
-        camera_config.aperture = aperture
+        timestamp = ts.strftime("%Y%m%d_%H%M%S")
+        ts = ts + timedelta(seconds=1)
+        filename_base = f"{timestamp}"
+        meta_filepath = Path(image_config.img_folder) / f"meta_{filename_base}.toml"
+        image_meta = ImageMeta(
+            focus=focus,
+            aperture=camera_config.aperture,
+            gain=camera_config.gain,
+            exposure=camera_config.exposure,
+            waiting=True,
+            error=None,
+            filename_base=str(filename_base),
+            selfpath=str(meta_filepath),
+        )
+        image_meta.serialize_to_toml(meta_filepath)
+        focus_meta[focus] = image_meta
 
-        try:
-            create_image(camera_config, image_config)
-            logger.info(
-                f"Image captured successfully with focus: {focus}, exposure: {exposure}, gain: {gain}, aperture: {aperture}"
-            )
-        except Exception as e:
-            logger.error(
-                f"Failed to capture image with focus: {focus}, exposure: {exposure}, gain: {gain}, aperture: {aperture}. Error: {e}"
-            )
+    # Define a function to run in a thread
+    def background_task():
+        for focus, image_meta in focus_meta.items():
+            camera_config.focus = focus
+            camera_config.exposure = exposure
+            camera_config.gain = gain
+            camera_config.aperture = aperture
 
-    return jsonify({"images_info": get_thumbnails()})
+            try:
+                create_image(
+                    camera_config, image_config, image_meta, queue=image_creation_queue
+                )
+                logger.info(
+                    f"Image captured successfully with focus: {focus}, exposure: {exposure}, gain: {gain}, aperture: {aperture}"
+                )
+            except Exception as e:
+                logger.error(
+                    f"Failed to capture image with focus: {focus}, exposure: {exposure}, gain: {gain}, aperture: {aperture}. Error: {e}"
+                )
+
+    # Start the background task
+    thread = Thread(target=background_task)
+    thread.start()
+
+    # Return immediately
+    thumbnails = get_thumbnails()
+    return jsonify({"images_info": [thumbnail.to_dict() for thumbnail in thumbnails]})
 
 
 @camera_bp.route("/media/<filename>")

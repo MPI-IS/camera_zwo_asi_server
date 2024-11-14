@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="bg-success text-white text-center p-3">
-        <h2>{{ request.host }}</h2>
+        <h2>nightskycam: camera local server</h2>
     </div>
     
     <div class="container mt-4">
@@ -19,7 +19,7 @@
             <table class="table table-bordered">
                 <tbody>
                     <tr>
-                        <td><label for="exposure">Exposure:</label></td>
+                        <td><label for="exposure">Exposure (micro seconds):</label></td>
                         <td><input type="number" name="exposure" value="{{ config.default_camera_config.exposure }}" required step="1"></td>
                     </tr>
                     <tr>
@@ -54,9 +54,12 @@
         </form>
 
         <h2>Captured Images</h2>
-        <p class="text-muted small">
-            Note: Only the latest 10 images will be displayed. Older images will be deleted.
-        </p>
+        <ul class="text-muted small">
+            <li>Only the latest 10 images will be displayed. Older images will be deleted.</li>
+            <li>This page refreshes every 5 seconds.</li>
+            <li>Hover over thumbnails to see the corresponding high-resolution image.</li>
+            <li>Click on the thumbnails to download the high-resolution image.</li>
+        </ul>
         <div id="thumbnails" class="table-responsive">
             <table class="table table-bordered">
                 <thead>

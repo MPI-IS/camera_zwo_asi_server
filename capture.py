@@ -146,6 +146,7 @@ class FocusAdapter:
     def close(cls) -> None:
         if cls.initialized:
             adapter.idle_adapter()
+            cls.initialized = False
 
     @classmethod
     def focus(cls, focus: Optional[int]) -> None:

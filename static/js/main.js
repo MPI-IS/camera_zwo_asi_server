@@ -118,6 +118,32 @@ $(document).ready(function() {
         }, 5000); // Poll every 5 seconds
     }
 
+    $('#init-adapter').on('click', function() {
+        $.ajax({
+            url: '/adapter/init',
+            method: 'POST',
+            success: function(response) {
+                $('#adapter-message').text(response.message).removeClass('alert-danger').addClass('alert-success');
+            },
+            error: function(xhr) {
+                $('#adapter-message').text(xhr.responseJSON.message).removeClass('alert-success').addClass('alert-danger');
+            }
+        });
+    });
+
+    $('#close-adapter').on('click', function() {
+        $.ajax({
+            url: '/adapter/close',
+            method: 'POST',
+            success: function(response) {
+                $('#adapter-message').text(response.message).removeClass('alert-danger').addClass('alert-success');
+            },
+            error: function(xhr) {
+                $('#adapter-message').text(xhr.responseJSON.message).removeClass('alert-success').addClass('alert-danger');
+            }
+        });
+    });
+
     loadImages(); // Initial load of images
     pollForNewImages(); // Start polling for new images
 });

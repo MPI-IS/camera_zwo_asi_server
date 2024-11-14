@@ -14,7 +14,18 @@
     </div>
     
     <div class="container mt-4">
-        <h1>Configuration</h1>
+        <div class="mt-4">
+            <button id="init-adapter" class="btn btn-success">Activate Adapter</button>
+            <button id="close-adapter" class="btn btn-danger">Close Adapter</button>
+            <div id="adapter-message" class="mt-2"></div>
+            <ul class="text-muted small">
+                <li>before taking picture, activate the adapter</li>
+                <li>close the adapter to fix the focus at the value of the latest captured picture</li>
+            </ul>
+        </div>
+        <br>
+
+        <h2>Configuration</h2>
         <form method="post" action="{{ url_for('camera.capture') }}">
             <table class="table table-bordered">
                 <tbody>
@@ -32,11 +43,11 @@
                     <tr>
                         <td>
                             <label for="focus_min">Focus Min:</label>
-                            <input type="number" name="focus_min" value="{{ config.default_camera_config.focus or 0 }}" required step="1">
+                            <input type="number" name="focus_min" value="{{ config.default_camera_config.focus or 400 }}" required step="1" min="350" max="650">
                         </td>
                         <td>
                             <label for="focus_max">Focus Max (optional):</label>
-                            <input type="number" name="focus_max" step="1">
+                            <input type="number" name="focus_max" step="1" min="350" max="650">
                         </td>
                         <td>
                             <label for="focus_step">Focus Step (optional):</label>
@@ -59,6 +70,7 @@
                 </tbody>
             </table>
         </form>
+        <br>
 
         <h2>Images</h2>
         <ul class="text-muted small">

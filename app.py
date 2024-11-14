@@ -15,9 +15,8 @@ def _get_default_config() -> CameraConfig:
     has_aperture = os.getenv("HAS_APERTURE", "FALSE").upper() == "TRUE"
     exposure = int(os.getenv("DEFAULT_EXPOSURE", 0))
     gain = int(os.getenv("DEFAULT_GAIN", 0))
-    focus = int(os.getenv("DEFAULT_FOCUS", 0)) if has_focus else None
+    focus = int(os.getenv("DEFAULT_FOCUS", 400)) if has_focus else None
     aperture = int(os.getenv("DEFAULT_APERTURE", 0)) if has_aperture else None
-
     camera_type = CameraType[str(camera_type_)]
 
     return CameraConfig(
@@ -42,6 +41,7 @@ def create_app() -> Flask:
     load_dotenv(dotenv_path=path_to_env_file, override=True)
     app = Flask(__name__)
     app.config["default_camera_config"] = _get_default_config()
+    print(app.config["default_camera_config"])
     app.config["image_config"] = _get_image_config()
     app.register_blueprint(camera_bp)
 

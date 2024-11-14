@@ -17,7 +17,7 @@ from flask import (
     send_from_directory,
 )
 
-from capture import ImageInfo, ImageMeta, create_image
+from capture import FocusAdapter, ImageInfo, ImageMeta, create_image
 
 camera_bp = Blueprint("camera", __name__)
 
@@ -122,3 +122,33 @@ def capture():
 def serve_media(filename):
     image_config = current_app.config["image_config"]
     return send_from_directory(image_config.img_folder, filename)
+
+
+@camera_bp.route("/adapter/init", methods=["POST"])
+def init_adapter():
+    try:
+        FocusAdapter.init()
+        return jsonify({"message": "Adapter initialized successfully"}), 200
+    except NameError:
+        error = f"adapter not supported"
+        logger.error(error)
+        return jsonify({"message": error}), 500
+    except Exception as e:
+        error = f"Failed to initialize adapter ({str(type(e))}): {e}"
+        logger.error(error)
+        return jsonify({"message": error}), 500
+
+
+@camera_bp.route("/adapter/close", methods=["POST"])
+def close_adapter():
+    try:
+        FocusAdapter.close()
+        return jsonify({"message": "Adapter closed successfully"}), 200
+    except NameError:
+        error = f"adapter not supported"
+        logger.error(error)
+        return jsonify({"message": error}), 500
+    except Exception as e:
+        error = f"Failed to close adapter ({str(type(e))}): {e}"
+        logger.error(error)
+        return jsonify({"message": error}), 500

@@ -11,10 +11,18 @@ from typing import List, Optional, Tuple
 
 import camera_zwo_asi as zwo
 import cv2
-import nightskycam_focus as nf
 import numpy as np
 import toml
 from PIL import Image
+
+_adapter_imported = False
+try:
+    # will fail if not on rasberry pi
+    from nightskycam_focus import adapter
+
+    _adapter_imported = True
+except RuntimeError:
+    pass
 
 # Get the logger configured in app.py
 logger = logging.getLogger(__name__)
@@ -131,25 +139,25 @@ class FocusAdapter:
     @classmethod
     def init(cls) -> None:
         if not cls.initialized:
-            nf.adapter.init_adapter()
+            adapter.init_adapter()
             cls.initialized = True
 
     @classmethod
     def close(cls) -> None:
         if cls.initialized:
-            nf.adapter.idle_adapter()
+            adapter.idle_adapter()
 
     @classmethod
     def focus(cls, focus: Optional[int]) -> None:
         if focus is not None:
             cls.init()
-            nf.adapter.set_focus(focus)
+            adapter.set_focus(focus)
 
     @classmethod
     def aperture(cls, aperture: Optional[int]) -> None:
         if aperture is not None:
             cls.init()
-            nf.adapter.set_aperture(aperture)
+            adapter.set_aperture(aperture)
 
 
 class CameraType(Enum):

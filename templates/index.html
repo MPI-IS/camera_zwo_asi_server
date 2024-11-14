@@ -14,36 +14,43 @@
     </div>
     
     <div class="container mt-4">
-        <h1>Camera Configuration</h1>
+        <h1>Configuration</h1>
         <form method="post" action="{{ url_for('camera.capture') }}">
             <table class="table table-bordered">
                 <tbody>
                     <tr>
-                        <td><label for="exposure">Exposure (micro seconds):</label></td>
-                        <td><input type="number" name="exposure" value="{{ config.default_camera_config.exposure }}" required step="1"></td>
-                    </tr>
-                    <tr>
-                        <td><label for="gain">Gain:</label></td>
-                        <td><input type="number" name="gain" value="{{ config.default_camera_config.gain }}" required step="1"></td>
+                        <td>
+                            <label for="exposure">Exposure (μs):</label>
+                            <input type="number" name="exposure" value="{{ config.default_camera_config.exposure }}" required step="1">
+                        </td>
+                        <td>
+                            <label for="gain">Gain:</label>
+                            <input type="number" name="gain" value="{{ config.default_camera_config.gain }}" required step="1">
+                        </td>
                     </tr>
                     {% if config.default_camera_config.focus is not none %}
                     <tr>
-                        <td><label for="focus_min">Focus Min:</label></td>
-                        <td><input type="number" name="focus_min" value="{{ config.default_camera_config.focus or 0 }}" required step="1"></td>
-                    </tr>
-                    <tr>
-                        <td><label for="focus_max">Focus Max (optional):</label></td>
-                        <td><input type="number" name="focus_max" step="1"></td>
-                    </tr>
-                    <tr>
-                        <td><label for="focus_step">Focus Step (optional):</label></td>
-                        <td><input type="number" name="focus_step" step="1"></td>
+                        <td>
+                            <label for="focus_min">Focus Min:</label>
+                            <input type="number" name="focus_min" value="{{ config.default_camera_config.focus or 0 }}" required step="1">
+                        </td>
+                        <td>
+                            <label for="focus_max">Focus Max (optional):</label>
+                            <input type="number" name="focus_max" step="1">
+                        </td>
+                        <td>
+                            <label for="focus_step">Focus Step (optional):</label>
+                            <input type="number" name="focus_step" step="1">
+                        </td>
                     </tr>
                     {% endif %}
                     {% if config.default_camera_config.aperture is not none %}
                     <tr>
-                        <td><label for="aperture">Aperture:</label></td>
-                        <td><input type="number" name="aperture" value="{{ config.default_camera_config.aperture or 0 }}" required step="1"></td>
+                        <td>
+                            <label for="aperture">Aperture:</label>
+                            <input type="number" name="aperture" value="{{ config.default_camera_config.aperture or 0 }}" required step="1">
+                        </td>
+                        <td></td>
                     </tr>
                     {% endif %}
                     <tr>
@@ -53,7 +60,7 @@
             </table>
         </form>
 
-        <h2>Captured Images</h2>
+        <h2>Images</h2>
         <ul class="text-muted small">
             <li>Only the latest 10 images will be displayed. Older images will be deleted.</li>
             <li>This page refreshes every 5 seconds.</li>

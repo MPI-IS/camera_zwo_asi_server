@@ -9,11 +9,11 @@ form {
 
 label {
     display: inline-block;
-    width: 100px;
+    width: 120px;
 }
 
 input[type="number"] {
-    width: 100px;
+    width: 120px;
 }
 
 .table {

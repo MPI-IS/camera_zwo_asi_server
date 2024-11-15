@@ -41,6 +41,10 @@ class ImageMeta:
 
     def serialize_to_toml(self, file_path: Path) -> None:
         data = {k: v for k, v in self.__dict__.items() if v is not None}
+        print()
+        print("serialize")
+        print(data)
+        print()
         with file_path.open("w") as f:
             toml.dump(data, f)
 
@@ -54,7 +58,7 @@ class ImageMeta:
         return cls(**data)
 
     def to_dict(self) -> dict:
-        return {
+        r = {
             "focus": self.focus,
             "aperture": self.aperture,
             "exposure": self.exposure,
@@ -64,6 +68,7 @@ class ImageMeta:
             "selfpath": self.selfpath,
             "filename_base": self.filename_base,
         }
+        return r
 
 
 @dataclass

@@ -81,9 +81,9 @@ def capture():
         meta_filepath = Path(image_config.img_folder) / f"meta_{filename_base}.toml"
         image_meta = ImageMeta(
             focus=focus,
-            aperture=camera_config.aperture,
-            gain=camera_config.gain,
-            exposure=camera_config.exposure,
+            aperture=aperture,
+            gain=gain,
+            exposure=exposure,
             waiting=True,
             error=None,
             filename_base=str(filename_base),

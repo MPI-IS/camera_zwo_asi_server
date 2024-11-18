@@ -12,6 +12,7 @@ $(document).ready(function() {
                         const thumbnailColumn = $('<td class="align-middle"></td>');
                         const highResColumn = $('<td class="align-middle high-res-container"></td>');
                         const configColumn = $('<td class="align-middle"></td>');
+                        const downloadColumn = $('<td class="align-middle"></td>');
                         if (image.meta.error) {
                             // Display error message if present
                             thumbnailColumn.append('<div class="alert alert-danger">' + image.meta.error + '</div>');
@@ -26,6 +27,9 @@ $(document).ready(function() {
 
                             const highResImg = $('<img>').attr('src', '/media/' + image.image).attr('alt', 'High Resolution').addClass('img-fluid high-res');
                             highResColumn.append(highResImg);
+
+                            const downloadLink = $('<a>').attr('href', '/media/' + image.image).attr('download', '').text('Download');
+                            downloadColumn.append(downloadLink);
                         }
 
                         let configInfo = 'Exposure: ' + image.meta.exposure + '<br>Gain: ' + image.meta.gain;
@@ -36,7 +40,7 @@ $(document).ready(function() {
                             configInfo += '<br>Aperture: ' + image.meta.aperture;
                         }
                         configColumn.append('<div class="config">' + configInfo + '</div>');
-                        row.append(thumbnailColumn, highResColumn, configColumn);
+                        row.append(thumbnailColumn, highResColumn, configColumn, downloadColumn);
                         $('#thumbnails tbody').append(row);
                     });
                     addClickEffect();

@@ -101,7 +101,10 @@ $(document).ready(function() {
             const highResImg = $('<img>')
                 .attr('src', fullResImgSrc)
                 .attr('alt', 'High Resolution')
-                .addClass('high-res');
+                .addClass('high-res')
+                .css({
+                    'image-rendering': 'pixelated' // Disable smoothing
+                });
 
             // Append the high-resolution image to the corresponding high-res container
             const highResContainer = thumbnail.closest('tr').find('.high-res-container');

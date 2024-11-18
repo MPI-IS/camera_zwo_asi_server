@@ -7,7 +7,7 @@ $(document).ready(function() {
             success: function(data) {
                 if (data.images_info) {
                     $('#thumbnails tbody').empty(); // Clear existing thumbnails
-                    data.images_info.forEach(function(image) {
+                    data.images_info.forEach(function(image, index) {
                         const row = $('<tr></tr>');
                         const thumbnailColumn = $('<td class="align-middle"></td>');
                         const highResColumn = $('<td class="align-middle high-res-container"></td>');
@@ -20,10 +20,8 @@ $(document).ready(function() {
                             thumbnailColumn.append('<div class="alert alert-info">waiting for image</div>');
                         } else {
                             const thumbnail = $('<div class="thumbnail"></div>');
-                            const link = $('<a></a>').attr('href', '/media/' + image.image);
-                            const img = $('<img>').attr('src', '/media/' + image.thumbnail).attr('alt', 'Thumbnail').addClass('img-fluid');
-                            link.append(img);
-                            thumbnail.append(link);
+                            const img = $('<img>').attr('src', '/media/' + image.thumbnail).attr('alt', 'Thumbnail').addClass('img-fluid').data('index', index);
+                            thumbnail.append(img);
                             thumbnailColumn.append(thumbnail);
 
                             const highResImg = $('<img>').attr('src', '/media/' + image.image).attr('alt', 'High Resolution').addClass('img-fluid high-res');
@@ -41,7 +39,8 @@ $(document).ready(function() {
                         row.append(thumbnailColumn, highResColumn, configColumn);
                         $('#thumbnails tbody').append(row);
                     });
-                    addHoverEffect();
+                    addClickEffect();
+                    restoreHighResImage();
                 } else {
                     console.error("No images_info found in response");
                 }
@@ -67,13 +66,29 @@ $(document).ready(function() {
         });
     });
 
-    function addHoverEffect() {
-        $('.thumbnail img').hover(function() {
+    function addClickEffect() {
+        $('.thumbnail img').on('click', function(event) {
             const thumbnail = $(this);
-            const fullResImgSrc = thumbnail.parent().attr('href').replace('thumbnail_', ''); // Full-resolution image path
+            const index = thumbnail.data('index');
 
-            // Log the full-resolution image path
-            console.log('Full Resolution Image Path:', fullResImgSrc);
+            // Calculate the position based on the click position
+            const offset = thumbnail.offset();
+            const x = event.pageX - offset.left;     // Get mouse x relative to the thumbnail
+            const y = event.pageY - offset.top;      // Get mouse y relative to the thumbnail
+
+            // Store the clicked position in local storage
+            localStorage.setItem('clickPositionX', x);
+            localStorage.setItem('clickPositionY', y);
+
+            // Update all high-resolution images
+            updateAllHighResImages(x, y);
+        });
+    }
+
+    function updateAllHighResImages(x, y) {
+        $('.thumbnail img').each(function() {
+            const thumbnail = $(this);
+            const fullResImgSrc = thumbnail.attr('src').replace('thumbnail_', '');
 
             // Create the high-resolution image element
             const highResImg = $('<img>')
@@ -86,30 +101,28 @@ $(document).ready(function() {
             highResContainer.empty().append(highResImg);
             highResImg.show(); // Show the high-res image
 
-            // Adjust position based on mouse movement
-            thumbnail.on('mousemove', function(e) {
-                const offset = thumbnail.offset();
-                const x = e.pageX - offset.left;     // Get mouse x relative to the thumbnail
-                const y = e.pageY - offset.top;      // Get mouse y relative to the thumbnail
+            // Scale the position based on the high-res image and thumbnail size
+            const scaleFactorX = highResImg.width() / thumbnail.width();
+            const scaleFactorY = highResImg.height() / thumbnail.height();
+            const newLeft = -(x * scaleFactorX - (highResContainer.width() / 2));
+            const newTop = -(y * scaleFactorY - (highResContainer.height() / 2));
 
-                // Scale the position based on the high-res image and thumbnail size
-                const scaleFactorX = highResImg.width() / thumbnail.width();
-                const scaleFactorY = highResImg.height() / thumbnail.height();
-                const newLeft = -(x * scaleFactorX - (highResContainer.width() / 2));
-                const newTop = -(y * scaleFactorY - (highResContainer.height() / 2));
-
-                // Move the high-res image based on calculated positions
-                highResImg.css({
-                    left: newLeft + 'px',
-                    top: newTop + 'px',
-                    position: 'absolute'
-                });
+            // Set the high-res image position based on calculated positions
+            highResImg.css({
+                left: newLeft + 'px',
+                top: newTop + 'px',
+                position: 'absolute'
             });
-
-        }, function() {
-            // Clear the high-res image when the mouse leaves
-            $(this).closest('tr').find('.high-res-container').empty();
         });
+    }
+
+    function restoreHighResImage() {
+        const clickPositionX = localStorage.getItem('clickPositionX');
+        const clickPositionY = localStorage.getItem('clickPositionY');
+
+        if (clickPositionX !== null && clickPositionY !== null) {
+            updateAllHighResImages(clickPositionX, clickPositionY);
+        }
     }
 
     function pollForNewImages() {

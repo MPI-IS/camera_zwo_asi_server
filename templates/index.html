@@ -7,6 +7,23 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <style>
+        .scale-factor-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .scale-factor-container label {
+            margin-right: 5px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        .scale-factor-container select {
+            width: auto;
+            font-size: 0.9em;
+            padding: 2px 5px;
+        }
+    </style>
 </head>
 <body>
     <div class="bg-success text-white text-center p-3">
@@ -83,9 +100,23 @@
         <ul class="text-muted small">
             <li>Only the latest 10 images will be displayed. Older images will be deleted.</li>
             <li>This page refreshes every 5 seconds.</li>
-            <li>Hover over thumbnails to see the corresponding high-resolution image.</li>
-            <li>Click on the thumbnails to download the high-resolution image.</li>
+            <li>Click on any thumbnails to see the corresponding high-resolution image.</li>
         </ul>
+        <div class="form-group row scale-factor-container align-items-center">
+            <label for="scale-factor" class="col-auto col-form-label">High-resolution Scale Factor:</label>
+            <div class="col-auto">
+                <select id="scale-factor" class="form-control">
+                    <option value="1">1x</option>
+                    <option value="2">2x</option>
+                    <option value="3">3x</option>
+                    <option value="4">4x</option>
+                    <option value="5" selected>5x</option>
+                    <option value="6" selected>6x</option>
+                    <option value="7" selected>7x</option>
+                    <option value="8" selected>8x</option>
+                </select>
+            </div>
+        </div>
         <div id="thumbnails" class="table-responsive">
             <table class="table table-bordered">
                 <thead>

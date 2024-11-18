@@ -74,3 +74,7 @@ input[type="number"] {
     max-width: none; /* Override max-width limiting */
     max-height: none; /* Override max-height limiting */
 }
+
+.scale-factor-container {
+    margin-bottom: 10px; /* Keep margin for spacing */
+}

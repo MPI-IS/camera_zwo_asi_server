@@ -1,6 +1,4 @@
 $(document).ready(function() {
-    const defaultScaleFactor = 5; // Default scale factor
-
     // Function to load images initially and after capture
     function loadImages() {
         $.ajax({
@@ -82,8 +80,11 @@ $(document).ready(function() {
             localStorage.setItem('clickPositionX', x);
             localStorage.setItem('clickPositionY', y);
 
-            // Update all high-resolution images with the default scale factor
-            updateAllHighResImages(x, y, defaultScaleFactor);
+            // Get the selected scale factor
+            const scaleFactor = parseFloat($('#scale-factor').val());
+
+            // Update all high-resolution images with the selected scale factor
+            updateAllHighResImages(x, y, scaleFactor);
         });
     }
 
@@ -127,9 +128,10 @@ $(document).ready(function() {
     function restoreHighResImage() {
         const clickPositionX = localStorage.getItem('clickPositionX');
         const clickPositionY = localStorage.getItem('clickPositionY');
+        const scaleFactor = parseFloat($('#scale-factor').val());
 
         if (clickPositionX !== null && clickPositionY !== null) {
-            updateAllHighResImages(clickPositionX, clickPositionY, defaultScaleFactor);
+            updateAllHighResImages(clickPositionX, clickPositionY, scaleFactor);
         }
     }
 
@@ -138,6 +140,16 @@ $(document).ready(function() {
             loadImages(); // Reload images periodically
         }, 5000); // Poll every 5 seconds
     }
+
+    $('#scale-factor').on('change', function() {
+        const clickPositionX = localStorage.getItem('clickPositionX');
+        const clickPositionY = localStorage.getItem('clickPositionY');
+        const scaleFactor = parseFloat($(this).val());
+
+        if (clickPositionX !== null && clickPositionY !== null) {
+            updateAllHighResImages(clickPositionX, clickPositionY, scaleFactor);
+        }
+    });
 
     $('#init-adapter').on('click', function() {
         $.ajax({

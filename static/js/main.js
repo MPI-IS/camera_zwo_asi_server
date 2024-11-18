@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    const defaultScaleFactor = 5; // Default scale factor
+
     // Function to load images initially and after capture
     function loadImages() {
         $.ajax({
@@ -80,12 +82,12 @@ $(document).ready(function() {
             localStorage.setItem('clickPositionX', x);
             localStorage.setItem('clickPositionY', y);
 
-            // Update all high-resolution images
-            updateAllHighResImages(x, y);
+            // Update all high-resolution images with the default scale factor
+            updateAllHighResImages(x, y, defaultScaleFactor);
         });
     }
 
-    function updateAllHighResImages(x, y) {
+    function updateAllHighResImages(x, y, scaleFactor) {
         $('.thumbnail img').each(function() {
             const thumbnail = $(this);
             const fullResImgSrc = thumbnail.attr('src').replace('thumbnail_', '');
@@ -101,17 +103,23 @@ $(document).ready(function() {
             highResContainer.empty().append(highResImg);
             highResImg.show(); // Show the high-res image
 
+            // Apply zoom using CSS transform
+            highResImg.css({
+                transform: `scale(${scaleFactor})`,
+                transformOrigin: 'top left',
+                position: 'absolute'
+            });
+
             // Scale the position based on the high-res image and thumbnail size
             const scaleFactorX = highResImg.width() / thumbnail.width();
             const scaleFactorY = highResImg.height() / thumbnail.height();
-            const newLeft = -(x * scaleFactorX - (highResContainer.width() / 2));
-            const newTop = -(y * scaleFactorY - (highResContainer.height() / 2));
+            const newLeft = -(x * scaleFactorX * scaleFactor - (highResContainer.width() / 2));
+            const newTop = -(y * scaleFactorY * scaleFactor - (highResContainer.height() / 2));
 
             // Set the high-res image position based on calculated positions
             highResImg.css({
                 left: newLeft + 'px',
-                top: newTop + 'px',
-                position: 'absolute'
+                top: newTop + 'px'
             });
         });
     }
@@ -121,7 +129,7 @@ $(document).ready(function() {
         const clickPositionY = localStorage.getItem('clickPositionY');
 
         if (clickPositionX !== null && clickPositionY !== null) {
-            updateAllHighResImages(clickPositionX, clickPositionY);
+            updateAllHighResImages(clickPositionX, clickPositionY, defaultScaleFactor);
         }
     }
 

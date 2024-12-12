@@ -21,9 +21,7 @@ from capture import FocusAdapter, ImageInfo, ImageMeta, create_image
 
 camera_bp = Blueprint("camera", __name__)
 
-# Get the logger configured in app.py
 logger = logging.getLogger(__name__)
-
 
 def get_thumbnails() -> List[ImageInfo]:
     """Helper function to retrieve the list of thumbnails sorted by timestamp."""

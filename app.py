@@ -3,10 +3,14 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, send_from_directory, render_template_string
 
 from capture import CameraConfig, CameraType, ImageConfig
 from routes.camera_routes import camera_bp
+from routes.images_routes import images_bp
+
+
+_MEDIA_FOLDER: str = "/tmp/camera_zwo_asi_server"
 
 
 def _get_default_config() -> CameraConfig:
@@ -29,7 +33,7 @@ def _get_default_config() -> CameraConfig:
 
 
 def _get_image_config() -> ImageConfig:
-    folder = os.getenv("IMG_FOLDER", "/tmp/camera_zwo_asi_server")
+    folder = os.getenv("IMG_FOLDER", _MEDIA_FOLDER)
     Path(folder).mkdir(exist_ok=True)
     tw = int(os.getenv("THUMBNAIL_WIDTH", 200))
     th = int(os.getenv("THUMBNAIL_HEIGHT", 200))
@@ -43,6 +47,7 @@ def create_app() -> Flask:
     app.config["default_camera_config"] = _get_default_config()
     print(app.config["default_camera_config"])
     app.config["image_config"] = _get_image_config()
+    app.register_blueprint(images_bp)
     app.register_blueprint(camera_bp)
 
     # Set up logging

@@ -8,7 +8,7 @@ images_bp = Blueprint('images_bp', __name__)
 
 logger = logging.getLogger(__name__)
 
-@images_bp.route("/images")
+@images_bp.route("/explore")
 def list_files():
     logger.info(f"listing files in {_MEDIA_FOLDER}")
     files = os.listdir(_MEDIA_FOLDER)
@@ -25,6 +25,6 @@ def list_files():
     """
     return render_template_string(html_template, files=files)
 
-@images_bp.route("/images/<filename>")
+@images_bp.route("/explore/<filename>")
 def download_file(filename):
     return send_from_directory(_MEDIA_FOLDER, filename, as_attachment=True)

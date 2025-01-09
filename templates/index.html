@@ -67,11 +67,11 @@
                     <tr>
                         <td>
                             <label for="focus_min">Focus Min:</label>
-                            <input type="number" name="focus_min" value="{{ config.default_camera_config.focus or 400 }}" required step="1" min="350" max="650">
+                            <input type="number" name="focus_min" value="{{ config.default_camera_config.focus or 400 }}" required step="1" min="1" max="3070">
                         </td>
                         <td>
                             <label for="focus_max">Focus Max (optional):</label>
-                            <input type="number" name="focus_max" step="1" min="350" max="650">
+                            <input type="number" name="focus_max" step="1" min="1" max="3070">
                         </td>
                         <td>
                             <label for="focus_step">Focus Step (optional):</label>

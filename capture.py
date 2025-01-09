@@ -6,7 +6,7 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from queue import Queue
-from threading import Lock, Thread
+from threading import Lock
 from typing import List, Optional, Tuple
 
 import camera_zwo_asi as zwo
@@ -83,13 +83,21 @@ class ImageInfo:
         for toml_file in folder_path.glob("meta_*.toml"):
             timestamp_str = toml_file.stem.replace("meta_", "")
             image_file = str(folder_path / f"{timestamp_str}.jpeg")
-            thumbnail_file = str(folder_path / f"thumbnail_{timestamp_str}.jpeg")
+            thumbnail_file = str(
+                folder_path / f"thumbnail_{timestamp_str}.jpeg"
+            )
 
             meta = ImageMeta.from_toml(toml_file)
             image_info = cls(
-                image=Path(image_file).name if Path(image_file).exists() else None,
+                image=(
+                    Path(image_file).name
+                    if Path(image_file).exists()
+                    else None
+                ),
                 thumbnail=(
-                    Path(thumbnail_file).name if Path(thumbnail_file).exists() else None
+                    Path(thumbnail_file).name
+                    if Path(thumbnail_file).exists()
+                    else None
                 ),
                 meta=meta,
                 timestamp=datetime.strptime(timestamp_str, "%Y%m%d_%H%M%S"),
